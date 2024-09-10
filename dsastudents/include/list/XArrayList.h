@@ -224,13 +224,6 @@ void XArrayList<T>::removeInternalData()
     {
         deleteUserData(this);
     }
-    else
-    {
-        for (int i = 0; i < count; ++i)
-        {
-            delete data[i];
-        }
-    }
     delete[] data;
     data = NULL;
     count = 0;
