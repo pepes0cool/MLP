@@ -363,7 +363,7 @@ int XArrayList<T>::indexOf(T item)
     for (int i = 0; i < count; ++i)
     {
         if (equals(data[i], item, itemEqual))
-            return true;
+            return i;
     }
     return -1;
 }
