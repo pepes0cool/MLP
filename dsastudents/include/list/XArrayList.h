@@ -362,8 +362,8 @@ int XArrayList<T>::indexOf(T item)
     // TODO
     for (int i = 0; i < count; ++i)
     {
-        if (data[i] == item)
-            return i;
+        if (equals(data[i], item, itemEqual))
+            return true;
     }
     return -1;
 }
@@ -373,7 +373,7 @@ bool XArrayList<T>::contains(T item)
     // TODO
     for (int i = 0; i < count; ++i)
     {
-        if (data[i] == item)
+        if (equals(data[i], item, itemEqual))
             return true;
     }
     return false;
