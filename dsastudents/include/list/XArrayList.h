@@ -224,13 +224,6 @@ void XArrayList<T>::removeInternalData()
     {
         deleteUserData(this);
     }
-    else
-    {
-        for (int i = 0; i < count; ++i)
-        {
-            delete data[i];
-        }
-    }
     delete[] data;
     data = NULL;
     count = 0;
@@ -369,7 +362,7 @@ int XArrayList<T>::indexOf(T item)
     // TODO
     for (int i = 0; i < count; ++i)
     {
-        if (data[i] == item)
+        if (equals(data[i], item, itemEqual))
             return i;
     }
     return -1;
@@ -380,7 +373,7 @@ bool XArrayList<T>::contains(T item)
     // TODO
     for (int i = 0; i < count; ++i)
     {
-        if (data[i] == item)
+        if (equals(data[i], item, itemEqual))
             return true;
     }
     return false;
