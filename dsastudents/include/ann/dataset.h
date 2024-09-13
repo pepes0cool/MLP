@@ -74,31 +74,39 @@ public:
     TensorDataset(xt::xarray<DType> data, xt::xarray<LType> label){
         /* TODO: your code is here for the initialization
          */
+         this->data = data;
+         this->label = label;
+         this->data_shape = data.shape();
+         this->label_shape = label.shape();
     }
     /* len():
      *  return the size of dimension 0
     */
-    int len(){
+    int len() override {
         /* TODO: your code is here to return the dataset's length
          */
-        return 0; //remove it when complete
+        return data_shape[0];
+  
     }
     
     /* getitem:
      * return the data item (of type: DataLabel) that is specified by index
      */
-    DataLabel<DType, LType> getitem(int index){
+    DataLabel<DType, LType> getitem(int index) override {
         /* TODO: your code is here
          */
+        return DataLabel<DType, LType>(xt::view(data, index, xt::all()), xt::view(label, index, xt::all()));
     }
     
-    xt::svector<unsigned long> get_data_shape(){
+    xt::svector<unsigned long> get_data_shape() override {
         /* TODO: your code is here to return data_shape
          */
+        return data_shape;
     }
-    xt::svector<unsigned long> get_label_shape(){
+    xt::svector<unsigned long> get_label_shape() override {
         /* TODO: your code is here to return label_shape
          */
+        return label_shape;
     }
 };
 
