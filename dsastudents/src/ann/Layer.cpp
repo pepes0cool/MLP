@@ -14,10 +14,15 @@
 
 Layer::Layer() {
     /*TODO: Your code is here*/
+    is_training = false;
+    name = to_string(layer_idx);
+    layer_idx++;
 }
 
 Layer::Layer(const Layer& orig) {
     /*TODO: Your code is here*/ 
+    is_training = orig.is_training;
+    name = orig.name;
 }
 
 Layer::~Layer() {
