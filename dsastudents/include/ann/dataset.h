@@ -34,13 +34,26 @@ private:
     xt::xarray<DType> data;
     xt::xarray<LType> label;
 public:
+    Batch() = default;
     Batch(xt::xarray<DType> data,  xt::xarray<LType> label):
     data(data), label(label){
     }
     virtual ~Batch(){}
     xt::xarray<DType>& getData(){return data; }
     xt::xarray<LType>& getLabel(){return label; }
+    bool operator==(const Batch<DType, LType>& other) const {
+        return xt::all(xt::equal(this->data, other.data)) && xt::all(xt::equal(this->label, other.label));
+    }
+    string toString() const {
+        ostringstream oss;
+        oss << "Data: " << data << ", Labels: " << label;
+        return oss.str();
+    }
 };
+template<typename DType, typename LType>
+std::ostream& operator<<(std::ostream& os, const Batch<DType, LType>& batch) {
+    return os << batch.toString();
+    }  //overload operator << for batch
 
 
 template<typename DType, typename LType>
@@ -113,4 +126,3 @@ public:
 
 
 #endif /* DATASET_H */
-
