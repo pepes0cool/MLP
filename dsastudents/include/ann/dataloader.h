@@ -1,115 +1,83 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/cppFiles/file.h to edit this template
- */
-
-/*
- * File:   dataloader.h
- * Author: ltsach
- *
- * Created on September 2, 2024, 4:01 PM
- */
-
 #ifndef DATALOADER_H
 #define DATALOADER_H
 #include "ann/xtensor_lib.h"
 #include "ann/dataset.h"
+#include "list/XArrayList.h"
 
 using namespace std;
 
-template <typename DType, typename LType>
-class DataLoader
-{
+template<typename DType, typename LType>
+class DataLoader{
 public:
 private:
-    Dataset<DType, LType> *ptr_dataset;
+    Dataset<DType, LType>* ptr_dataset;
     int batch_size;
     bool shuffle;
     bool drop_last;
-    vector<int> indices; // shuffle the indices then access the dataset from indices
-    int curr;
-    vector<Batch<DType, LType>> batches;
-    /*TODO: add more member variables to support the iteration*/
-public:
-    DataLoader(Dataset<DType, LType> *ptr_dataset,
-               int batch_size,
-               bool shuffle = true,
-               bool drop_last = false) : ptr_dataset(ptr_dataset), batch_size(batch_size), shuffle(shuffle), drop_last(drop_last), curr(0)
-    {
-        /*TODO: Add your code to do the initialization */
-        int length = ptr_dataset->len();
-        indices.resize(length);
-        for (int i = 0; i < length; i++)
-        {
-            indices[i] = i; // set the index
-        }
-        if (shuffle)
-        {
-            random_device rd;
-            default_random_engine rng(rd());
-            std::shuffle(indices.begin(), indices.end(), rng);
-        }
+    XArrayList<int> indices;
+    int current_index;
+    XArrayList<Batch<DType, LType>> batches;
 
-        // Initialize batches
-        length = indices.size();
-        for (int start = 0; start < length; start += batch_size)
-        {   
-            int end = min(start + batch_size, length);
-            if (drop_last && end - start < batch_size)
-            {
-                // If drop_last is true and there are not enough samples for a full batch, skip
-                break;
+public:
+    DataLoader(Dataset<DType, LType>* ptr_dataset,
+               int batch_size,
+               bool shuffle=true,
+               bool drop_last=false) : ptr_dataset(ptr_dataset), batch_size(batch_size), shuffle(shuffle), drop_last(drop_last), current_index(0) {
+        /*TODO: Add your code to do the initialization */
+        int length = this->ptr_dataset->len();
+        for (int i = 0; i < length; ++i) indices.add(i);
+        if (shuffle) {
+            auto permuted_indices = xt::random::permutation(length);
+            for (int i = 0; i < length; ++i) {
+                indices.set(i, permuted_indices(i)); 
             }
-            vector<size_t> batch_indices(indices.begin() + start, indices.begin() + end);
-            xt::xarray<DType> batch_data = xt::expand_dims(ptr_dataset->getitem(batch_indices[0]).getData(), 0);
-            xt::xarray<LType> batch_labels = xt::expand_dims(ptr_dataset->getitem(batch_indices[0]).getLabel(), 0); // make data become 2D, this handle the first item in batch
+        }
+        for(int start = 0; start < length; start += batch_size){
+            int end = min(start + batch_size, length);
+            if(drop_last == true && end - start < batch_size)break;
+            XArrayList<size_t> batch_indices;
+            for(size_t i = start; i < end; ++i){
+                batch_indices.add(indices.get(i));
+            }//assign value of index to make a batch
+
+            auto first_item = ptr_dataset->getitem(batch_indices.get(0));
+            xt::xarray<DType> batch_data = xt::expand_dims(first_item.getData(), 0);
+            xt::xarray<LType> batch_labels = xt::expand_dims(first_item.getLabel(), 0); // make data become 2D, this handle the first item in batch
             //That ra co the bo thang vao for loop tu index 0 nhung lam nhu nay thi khong can phai check xem batch_data va label da dc init chua (?)
             for (size_t i = 1; i < batch_indices.size(); ++i)
-            {   
-                xt::xarray<DType> sample_data = xt::expand_dims(ptr_dataset->getitem(batch_indices[i]).getData(), 0);
-                xt::xarray<LType> sample_label = xt::expand_dims(ptr_dataset->getitem(batch_indices[i]).getLabel(), 0);//handle the rest item
-                batch_data = xt::concatenate(xt::xtuple(batch_data, sample_data), 0);
-                batch_labels = xt::concatenate(xt::xtuple(batch_labels, sample_label), 0);
+            {   auto item = ptr_dataset->getitem(batch_indices.get(i));
+                xt::xarray<DType> sample_data = xt::expand_dims(item.getData(), 0);
+                xt::xarray<LType> sample_label = xt::expand_dims(item.getLabel(), 0);//handle the rest item
+                
+                batch_data = xt::concatenate(xt::xtuple(std::move(batch_data), std::move(sample_data)), 0);
+                batch_labels = xt::concatenate(xt::xtuple(std::move(batch_labels), std::move(sample_label)), 0);
             }
-            batches.emplace_back(batch_data, batch_labels); // logically work like push_back, but diffrent way
+            batches.add(Batch<DType, LType>(batch_data, batch_labels));
+            current_index++;
         }
 
-        if (!drop_last && !batches.empty() && batches.back().getData().shape(0) < batch_size) {
-            if (batches.size() > 1) {
-                int second_last_idx = batches.size() - 2;
-                int last_idx = batches.size() - 1;
-
-                // Merge data
-                xt::xarray<DType> merged_data = xt::concatenate(xt::xtuple(batches[second_last_idx].getData(), batches[last_idx].getData()));
-                xt::xarray<LType> merged_labels = xt::concatenate(xt::xtuple(batches[second_last_idx].getLabel(), batches[last_idx].getLabel()));
-
-                batches.pop_back();
-                batches.pop_back();
-                // Push in the merge batch
-                batches.emplace_back(merged_data, merged_labels);
-
-            
-            }
+        if(drop_last == false && !batches.empty() && batches.get(batches.size() - 1).getData().shape(0) < batch_size){
+            if(batches.size() > 1){
+                int second_lastIdx = batches.size() - 2;
+                int lastIdx = batches.size() - 1;
+                xt::xarray<DType> merged_data = xt::concatenate(xt::xtuple(
+                    std::move(batches.get(second_lastIdx).getData()),
+                    std::move(batches.get(lastIdx).getData())
+                ));
+                xt::xarray<LType> merged_labels = xt::concatenate(xt::xtuple(
+                    std::move(batches.get(second_lastIdx).getLabel()),
+                    std::move(batches.get(lastIdx).getLabel())
+                ));
+                batches.removeAt(lastIdx);
+                batches.removeAt(second_lastIdx);
+                batches.add(Batch<DType, LType>(merged_data, merged_labels));
+            }   
         }
     }
+    virtual ~DataLoader(){}
 
-    bool has_next()
-    {
-        return curr < batches.size();
-    }
 
-    Batch<DType, LType> next()
-    {
-        if (!has_next())
-        {
-            throw std::out_of_range("No more batches available.");
-        }
-        return batches[curr++];
-    }
-
-    virtual ~DataLoader() {}
-
-    /////////////////////////////////////////////////////////////////////////
+     /////////////////////////////////////////////////////////////////////////
     // The section for supporting the iteration and for-each to DataLoader //
     /// START: Section                                                     //
     /////////////////////////////////////////////////////////////////////////
@@ -130,9 +98,10 @@ public:
             return pos != other.pos;
         }
 
+
         Batch<DType, LType> &operator*()
         {
-            return dataloader->batches[pos];
+            return dataloader->batches.get(pos);
         }
 
         const Iterator &operator++()
