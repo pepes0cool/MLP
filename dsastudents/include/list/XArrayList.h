@@ -83,6 +83,10 @@ public:
             it++;
         }
     }
+    void set(int index, T e) {
+        checkIndex(index);
+        data[index] = e;
+    }
 
 protected:
     void checkIndex(int index);     // check validity of index for accessing
@@ -443,7 +447,7 @@ void XArrayList<T>::ensureCapacity(int index)
     // TODO
     if (index < 0)
     {
-        throw out_of_range();
+        throw out_of_range("Index is out of range");
     }
     if (index >= capacity)
     {
@@ -466,5 +470,6 @@ void XArrayList<T>::ensureCapacity(int index)
         capacity = newCapacity;
     }
 }
+
 
 #endif /* XARRAYLIST_H */
