@@ -98,8 +98,11 @@ public:
             return pos != other.pos;
         }
 
+        bool operator==(const Iterator &other)const{
+            return pos == other.pos;
+        }
 
-        Batch<DType, LType> &operator*()
+        Batch<DType, LType> &operator*()const
         {
             return dataloader->batches.get(pos);
         }
