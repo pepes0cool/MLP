@@ -285,7 +285,12 @@ template <class T>
 DLinkedList<T>::~DLinkedList()
 {
     // TODO
-    removeInternalData();
+    Node* current = head->next;
+    while (current != nullptr) {
+        Node* next = current->next;
+        delete current;
+        current = next;
+    }
     delete head;
     delete tail;
 }
@@ -425,10 +430,12 @@ bool DLinkedList<T>::removeItem(T item, void (*removeItemData)(T))
             if(removeItemData != 0){
                 removeItemData(curr->data);
             }
-            delete curr;
+            Node* temp = curr;
+            curr = curr -> next;
             --count;
             return true;
         }
+        curr = curr->next;
     }
     return false;
 }
