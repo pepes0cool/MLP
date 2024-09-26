@@ -35,6 +35,7 @@ private:
     xt::xarray<LType> label;
 public:
     Batch() = default;
+    Batch(const Batch& other) : data(other.data), label(other.label) {}
     Batch(xt::xarray<DType> data,  xt::xarray<LType> label):
     data(data), label(label){
     }
