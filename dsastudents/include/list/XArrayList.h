@@ -227,9 +227,13 @@ void XArrayList<T>::removeInternalData()
     if (deleteUserData)
     {
         deleteUserData(this);
+    }else{
+        for(int i = 0; i < count; ++i){
+            data[i].~T();
+        }
     }
     delete[] data;
-    data = NULL;
+    data = nullptr;
     count = 0;
     capacity = 0;
 }
@@ -290,10 +294,12 @@ T XArrayList<T>::removeAt(int index)
     {
         throw out_of_range("Index is out of range");
     }
-    T x = data[index];
+
+    T x = move(data[index]);
+
     for (int i = index; i < count - 1; ++i)
     {
-        data[i] = data[i + 1];
+        data[i] = std::move(data[i + 1]);
     }
     --count;
     data[count] = T();
@@ -341,7 +347,7 @@ void XArrayList<T>::clear()
 {
     // TODO
     if (capacity != initialCapacity)
-    {
+    {   
         delete[] data;
     }
     data = new T[initialCapacity];
