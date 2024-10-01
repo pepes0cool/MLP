@@ -292,7 +292,7 @@ T XArrayList<T>::removeAt(int index)
     // TODO
     if (index < 0 || index >= count)
     {
-        throw out_of_range("Index is out of range");
+        throw out_of_range("Index is out of range!");
     }
 
     T x = move(data[index]);
@@ -312,7 +312,7 @@ bool XArrayList<T>::removeItem(T item, void (*removeItemData)(T))
     // TODO
     for (int i = 0; i < count; ++i)
     {
-        if (data[i] == item)
+        if (equals(data[i], item, itemEqual))
         {
             T removedItem = removeAt(i);
             if (removeItemData != NULL)
@@ -361,7 +361,7 @@ T &XArrayList<T>::get(int index)
     // TODO
     if (index < 0 || index >= count)
     {
-        throw out_of_range("Index is out of range");
+        throw out_of_range("Index is out of range!");
     }
     return data[index];
 }
@@ -438,7 +438,7 @@ void XArrayList<T>::checkIndex(int index)
     // TODO
     if (index < 0 || index > count)
     {
-        throw out_of_range("Index is out of range");
+        throw out_of_range("Index is out of range!");
     }
 }
 template <class T>
@@ -453,7 +453,7 @@ void XArrayList<T>::ensureCapacity(int index)
     // TODO
     if (index < 0)
     {
-        throw out_of_range("Index is out of range");
+        throw out_of_range("Index is out of range!");
     }
     if (index >= capacity)
     {
