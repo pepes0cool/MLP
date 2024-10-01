@@ -286,7 +286,7 @@ DLinkedList<T>::~DLinkedList()
 {
     // TODO
     Node* current = head->next;
-    while (current != nullptr) {
+    while (current != tail) {
         Node* next = current->next;
         delete current;
         current = next;
