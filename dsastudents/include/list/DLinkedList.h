@@ -326,7 +326,7 @@ typename DLinkedList<T>::Node *DLinkedList<T>::getPreviousNodeOf(int index)
     // TODO
     if (index < 0 || index > count)
     {
-        throw out_of_range("Index out of range");
+        throw out_of_range("Index is out of range!");
     }
     Node* current;
     if (index < count / 2)
@@ -354,7 +354,7 @@ T DLinkedList<T>::removeAt(int index)
     // TODO
     if (index < 0 || index >= count)
     {
-        throw out_of_range("Index out of range");
+        throw out_of_range("Index is out of range!");
     }
     Node *prevNode = getPreviousNodeOf(index);
     Node *nodeToRemove = prevNode->next;
@@ -396,7 +396,7 @@ T &DLinkedList<T>::get(int index)
     // TODO
     if (index < 0 || index >= count)
     {
-        throw out_of_range("Index out of range");
+        throw out_of_range("Index is out of range!");
     }
     Node* res = getPreviousNodeOf(index);
     return res->next->data;
