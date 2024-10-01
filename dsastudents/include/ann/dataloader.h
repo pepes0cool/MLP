@@ -34,12 +34,11 @@ public:
         }
         for(int start = 0; start < length; start += batch_size){
             int end = min(start + batch_size, length);
-            if(drop_last == true && end - start < batch_size)break;
             XArrayList<size_t> batch_indices;
             for(size_t i = start; i < end; ++i){
                 batch_indices.add(indices.get(i));
             }//assign value of index to make a batch
-
+            if(drop_last == true && end - start < batch_size)break;  
             auto first_item = ptr_dataset->getitem(batch_indices.get(0));
             xt::xarray<DType> batch_data = xt::expand_dims(first_item.getData(), 0);
             xt::xarray<LType> batch_labels = xt::expand_dims(first_item.getLabel(), 0); // make data become 2D, this handle the first item in batch
