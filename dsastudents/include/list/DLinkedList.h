@@ -509,18 +509,17 @@ void DLinkedList<T>::removeInternalData()
      * Traverses and deletes each node between the head and tail to release memory.
      */
     // TODO
+    if (deleteUserData != nullptr) {
+        deleteUserData(this);
+    }
     Node* curr = head->next;
     while(curr != tail){
         Node* tmp = curr;
-        curr->next->prev = nullptr;
         curr = curr->next;
         delete tmp;
     }
+    head->next = tail;
     tail->prev = head;
-    if (deleteUserData != nullptr)
-    {
-        deleteUserData(this);
-    }
     count = 0;
 }
 
