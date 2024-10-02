@@ -111,7 +111,11 @@ public:
             ++pos;
             return *this;
         }
-
+        Iterator operator++(int) {
+            Iterator temp = *this;
+            ++(*this);
+            return temp;
+        }
         const Iterator &operator--()
         {
             --pos;
