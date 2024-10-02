@@ -5,11 +5,10 @@
 
 #include "ann/xtensor_lib.h"
 
-
-string shape2str(xt::svector<unsigned long> vec){
+string shape2str(xt::svector<size_t> vec){
     stringstream ss;
     ss << "(";
-    for(int idx=0; idx < vec.size(); idx++){
+    for(size_t idx=0; idx < vec.size(); idx++){
         ss << vec[idx] << ", ";
     }
     string res = ss.str();
