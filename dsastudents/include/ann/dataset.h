@@ -36,9 +36,7 @@ private:
 public:
     Batch() = default;
     Batch(const Batch& other) : data(other.data), label(other.label) {}
-    Batch(xt::xarray<DType> data,  xt::xarray<LType> label):
-    data(data), label(label){
-    }
+    Batch(xt::xarray<DType> data,  xt::xarray<LType> label) : data(std::move(data)), label(std::move(label)) {}
     virtual ~Batch(){}
     xt::xarray<DType>& getData(){return data; }
     xt::xarray<LType>& getLabel(){return label; }
@@ -91,7 +89,11 @@ public:
         this->data = data;
         this->label = label;
         this->data_shape = xt::svector<unsigned long>(data.shape().begin(), data.shape().end());
-        this->label_shape = xt::svector<unsigned long>(label.shape().begin(), label.shape().end());
+        if (label.size() > 0) {
+            this->label_shape = xt::svector<unsigned long>(label.shape().begin(), label.shape().end());
+        } else {
+            this->label_shape = xt::svector<unsigned long>{};
+        }
     }
     /* len():
      *  return the size of dimension 0
@@ -110,7 +112,13 @@ public:
         /* TODO: your code is here
          */
         if(index < 0 || index >= this->len())throw out_of_range("Index is out of range!");
-        return DataLabel<DType, LType>(xt::view(data, index, xt::all()), xt::view(label, index, xt::all()));
+        if (label.size() == 0) {
+            return DataLabel<DType, LType>(xt::view(data, index, xt::all()), xt::xarray<LType>()); // Return empty label
+        }
+        return DataLabel<DType, LType>(
+            xt::view(data, index, xt::all()), // Get data at the specified index
+            xt::view(label, index, xt::all())  // Get corresponding label at the same index
+        );
     }
     
     xt::svector<unsigned long> get_data_shape() override {
