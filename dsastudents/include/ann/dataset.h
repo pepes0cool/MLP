@@ -109,6 +109,7 @@ public:
     DataLabel<DType, LType> getitem(int index) override {
         /* TODO: your code is here
          */
+        if(index >= this->len())throw out_of_range("Index is out of range!");
         return DataLabel<DType, LType>(xt::view(data, index, xt::all()), xt::view(label, index, xt::all()));
     }
     
