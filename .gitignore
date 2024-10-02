@@ -1,4 +1,5 @@
 dsastudents/.vscode/settings.json
-dsastudents/a.exe
-dsastudents/main.cpp
+a.exe
+main.cpp
 dsastudents/src/ann/xtensor_lib.cpp
+dsastudents/main.cpp
