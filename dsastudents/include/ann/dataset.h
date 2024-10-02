@@ -89,10 +89,10 @@ public:
         this->data = data;
         this->label = label;
         this->data_shape = xt::svector<unsigned long>(data.shape().begin(), data.shape().end());
-        if (label.size() > 0) {
-            this->label_shape = xt::svector<unsigned long>(label.shape().begin(), label.shape().end());
-        } else {
+        if (label.dimension() == 0) {
             this->label_shape = xt::svector<unsigned long>{};
+        } else {
+            this->label_shape = xt::svector<unsigned long>(label.shape().begin(), label.shape().end());
         }
     }
     /* len():
@@ -112,13 +112,12 @@ public:
         /* TODO: your code is here
          */
         if(index < 0 || index >= this->len())throw out_of_range("Index is out of range!");
-        if (label.size() == 0) {
-            return DataLabel<DType, LType>(xt::view(data, index, xt::all()), xt::xarray<LType>()); // Return empty label
-        }
-        return DataLabel<DType, LType>(
-            xt::view(data, index, xt::all()), // Get data at the specified index
-            xt::view(label, index, xt::all())  // Get corresponding label at the same index
-        );
+        xt::xarray<DType> item_data = xt::view(data, index, xt::all());
+        xt::xarray<LType> item_label;
+        if (label.dimension() == 0) {
+           item_label = label;
+        }else item_label = xt::view(label, index, xt::all());
+        return DataLabel<DType, LType>(item_data, item_label);
     }
     
     xt::svector<unsigned long> get_data_shape() override {
