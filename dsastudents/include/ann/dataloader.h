@@ -18,7 +18,7 @@ private:
     XArrayList<int> indices;
     int current_index;
     XArrayList<Batch<DType, LType>> batches;
-    bool checkLabel;
+    bool checkLabel = false;
 
 public:
     DataLoader(Dataset<DType, LType> *ptr_dataset,
@@ -55,8 +55,7 @@ public:
             if (drop_last == true && end - start < batch_size)
                 break;
             auto first_item = ptr_dataset->getitem(batch_indices.get(0));
-            if (first_item.getLabel().dimension() > 0)
-                checkLabel = true;
+            if (ptr_dataset->get_label_shape().size() > 0)checkLabel = true;
             if (checkLabel)
             {
                 xt::xarray<DType> batch_data = xt::expand_dims(first_item.getData(), 0);
