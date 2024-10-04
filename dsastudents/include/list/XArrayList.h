@@ -227,13 +227,12 @@ void XArrayList<T>::removeInternalData()
     if (deleteUserData)
     {
         deleteUserData(this);
-    }else{
-        for(int i = 0; i < count; ++i){
-            data[i].~T();
-        }
+    }
+    
+    for(int i = 0; i < count; ++i){
+      data[i].~T();
     }
     delete[] data;
-    data = nullptr;
     count = 0;
     capacity = 0;
 }
@@ -317,7 +316,7 @@ bool XArrayList<T>::removeItem(T item, void (*removeItemData)(T))
             T removedItem = removeAt(i);
             if (removeItemData != NULL)
             {
-                removeItemData(removedItem);
+              removeItemData(removedItem);
             }
             return true;
         }
@@ -348,9 +347,10 @@ void XArrayList<T>::clear()
     // TODO
     if (capacity != initialCapacity)
     {   
+        removeInternalData();
         delete[] data;
     }
-    data = new T[initialCapacity];
+
     capacity = initialCapacity;
     count = 0;
 }
