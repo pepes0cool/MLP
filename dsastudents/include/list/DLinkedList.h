@@ -285,6 +285,9 @@ template <class T>
 DLinkedList<T>::~DLinkedList()
 {
     // TODO
+    if (deleteUserData != nullptr) {
+        deleteUserData(this);
+    }
     Node* current = head->next;
     while (current != tail) {
         Node* next = current->next;
