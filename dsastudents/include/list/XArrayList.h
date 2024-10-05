@@ -188,7 +188,7 @@ XArrayList<T>::XArrayList(
     int capacity) : deleteUserData(deleteUserData), itemEqual(itemEqual), count(0)
 {
     // TODO
-    this->capacity = (capacity > 0) ? capacity : 1;
+    this->capacity = (capacity > 0) ? capacity : 10;
     initialCapacity = capacity;
     data = new T[capacity];
 }
