@@ -430,11 +430,10 @@ bool DLinkedList<T>::removeItem(T item, void (*removeItemData)(T))
         if(equals(curr->data, item, itemEqual)){
             curr->prev->next = curr->next;
             curr->next->prev = curr->prev;
-            if(removeItemData != 0){
+            if(removeItemData != nullptr){
                 removeItemData(curr->data);
             }
-            Node* temp = curr;
-            curr = curr -> next;
+            delete curr; 
             --count;
             return true;
         }
