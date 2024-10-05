@@ -185,11 +185,12 @@ template <class T>
 XArrayList<T>::XArrayList(
     void (*deleteUserData)(XArrayList<T> *),
     bool (*itemEqual)(T &, T &),
-    int capacity) : deleteUserData(deleteUserData), itemEqual(itemEqual), capacity(capacity), count(0)
+    int capacity) : deleteUserData(deleteUserData), itemEqual(itemEqual), count(0)
 {
     // TODO
-    data = new T[capacity];
+    this->capacity = (capacity > 0) ? capacity : 1;
     initialCapacity = capacity;
+    data = new T[capacity];
 }
 
 template <class T>
@@ -301,7 +302,7 @@ T XArrayList<T>::removeAt(int index)
         data[i] = std::move(data[i + 1]);
     }
     --count;
-    data[count] = T();
+    data[count].~T();
     return x;
 }
 
@@ -345,13 +346,23 @@ template <class T>
 void XArrayList<T>::clear()
 {
     // TODO
+    if (deleteUserData)
+    {
+        deleteUserData(this);
+    }
+    
+    for (int i = 0; i < count; ++i)
+    {
+        data[i].~T();
+    }
+    
     if (capacity != initialCapacity)
     {   
-        removeInternalData();
         delete[] data;
+        data = new T[initialCapacity];
+        capacity = initialCapacity;
     }
-
-    capacity = initialCapacity;
+    
     count = 0;
 }
 
