@@ -45,7 +45,7 @@ public:
     }
     string toString() const {
         ostringstream oss;
-        oss << "Data: " << data << ", Labels: " << label;
+        oss << data << label;
         return oss.str();
     }
 };
