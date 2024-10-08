@@ -15,6 +15,7 @@ private:
     int batch_size;
     bool shuffle;
     bool drop_last;
+    int m_seed;
     XArrayList<int> indices;
     int current_index;
     XArrayList<Batch<DType, LType>> batches;
@@ -24,25 +25,29 @@ public:
     DataLoader(Dataset<DType, LType> *ptr_dataset,
                int batch_size,
                bool shuffle = true,
-               bool drop_last = false) : ptr_dataset(ptr_dataset), batch_size(batch_size), shuffle(shuffle), drop_last(drop_last), current_index(0)
+               bool drop_last = false, int seed = -1) : ptr_dataset(ptr_dataset), batch_size(batch_size), 
+               shuffle(shuffle), drop_last(drop_last), current_index(0), m_seed(seed)
     {
         /*TODO: Add your code to do the initialization */
         int length = this->ptr_dataset->len();
-        for (int i = 0; i < length; ++i)
+        if(length < batch_size)return;
+        for (int i = 0; i < length; ++i){
             indices.add(i);
-        if (shuffle)
+        }
+        xt::xarray<int> temp_array = xt::zeros<int>({indices.size()});
+        for (int i = 0; i < indices.size(); ++i)
         {
-            xt::xarray<int> temp_array = xt::zeros<int>({indices.size()});
-            for (int i = 0; i < indices.size(); ++i)
-            {
-                temp_array(i) = indices.get(i);
-            }
+            temp_array(i) = indices.get(i);
+        }
+        if (shuffle == true && this->m_seed >= 0)
+        {
+            xt::random::seed(this->m_seed);
             xt::random::shuffle(temp_array);
-            for (int i = 0; i < length; ++i)
+        }
+        for (int i = 0; i < length; ++i)
             {
                 indices.set(i, temp_array(i));
             }
-        }
 
         for (int start = 0; start < length; start += batch_size)
         {
