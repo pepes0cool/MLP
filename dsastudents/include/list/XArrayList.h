@@ -188,9 +188,10 @@ XArrayList<T>::XArrayList(
     int capacity) : deleteUserData(deleteUserData), itemEqual(itemEqual), count(0)
 {
     // TODO
-    this->capacity = (capacity > 0) ? capacity : 10;
-    initialCapacity = capacity;
-    data = new T[capacity];
+    this->capacity = capacity;
+    if(this->capacity <= 0)this->capacity = 10;
+    initialCapacity = this->capacity;
+    data = new T[this->capacity];
 }
 
 template <class T>
@@ -203,17 +204,17 @@ void XArrayList<T>::copyFrom(const XArrayList<T> &list)
      */
     // TODO
     removeInternalData(); // clean the current list
-    capacity = list.capacity;
-    data = new T[capacity];
-    count = list.count; // Initialize the list
+    this->capacity = list.capacity;
+    this->data = new T[this->capacity];
+    this->count = list.count; // Initialize the list
 
     for (int i = 0; i < count; ++i)
     {
         data[i] = list.data[i];
     } // copy the parameter list to this list data
 
-    deleteUserData = list.deleteUserData;
-    itemEqual = list.itemEqual;
+    this->deleteUserData = list.deleteUserData;
+    this->itemEqual = list.itemEqual;
 }
 
 template <class T>
@@ -229,19 +230,19 @@ void XArrayList<T>::removeInternalData()
     {
         deleteUserData(this);
     }
-    
     for(int i = 0; i < count; ++i){
       data[i].~T();
     }
     delete[] data;
-    count = 0;
-    capacity = 0;
+    this->count = 0;
+    this->capacity = 0;
 }
 
 template <class T>
 XArrayList<T>::XArrayList(const XArrayList<T> &list)
 {
     // TODO
+    removeInternalData();
     copyFrom(list);
 }
 
@@ -296,7 +297,6 @@ T XArrayList<T>::removeAt(int index)
     }
 
     T x = move(data[index]);
-
     for (int i = index; i < count - 1; ++i)
     {
         data[i] = std::move(data[i + 1]);
@@ -355,14 +355,6 @@ void XArrayList<T>::clear()
     {
         data[i].~T();
     }
-    
-    if (capacity != initialCapacity)
-    {   
-        delete[] data;
-        data = new T[initialCapacity];
-        capacity = initialCapacity;
-    }
-    
     count = 0;
 }
 
