@@ -36,7 +36,9 @@ private:
 public:
     Batch() = default;
     Batch(const Batch& other) : data(other.data), label(other.label) {}
-    Batch(xt::xarray<DType> data,  xt::xarray<LType> label) : data(std::move(data)), label(std::move(label)) {}
+    Batch(xt::xarray<DType> data,  xt::xarray<LType> label):
+    data(std::move(data)), label(std::move(label)){
+    }
     virtual ~Batch(){}
     xt::xarray<DType>& getData(){return data; }
     xt::xarray<LType>& getLabel(){return label; }
@@ -53,7 +55,6 @@ template<typename DType, typename LType>
 std::ostream& operator<<(std::ostream& os, const Batch<DType, LType>& batch) {
     return os << batch.toString();
     }  //overload operator << for batch
-
 
 template<typename DType, typename LType>
 class Dataset{
@@ -83,7 +84,6 @@ public:
      * 1. data, label;
      * 2. data_shape, label_shape
     */
-   
     TensorDataset(xt::xarray<DType> data, xt::xarray<LType> label){
         /* TODO: your code is here for the initialization
          */
@@ -99,17 +99,16 @@ public:
     /* len():
      *  return the size of dimension 0
     */
-    int len() override {
+    int len() override{
         /* TODO: your code is here to return the dataset's length
          */
         return data_shape[0];
-  
     }
     
     /* getitem:
      * return the data item (of type: DataLabel) that is specified by index
      */
-    DataLabel<DType, LType> getitem(int index) override {
+    DataLabel<DType, LType> getitem(int index) override{
         /* TODO: your code is here
          */
         if(index < 0 || index >= this->len())throw out_of_range("Index is out of range!");
@@ -121,12 +120,12 @@ public:
         return DataLabel<DType, LType>(item_data, item_label);
     }
     
-    xt::svector<unsigned long> get_data_shape() override {
+    xt::svector<unsigned long> get_data_shape() override{
         /* TODO: your code is here to return data_shape
          */
         return data_shape;
     }
-    xt::svector<unsigned long> get_label_shape() override {
+    xt::svector<unsigned long> get_label_shape() override{
         /* TODO: your code is here to return label_shape
          */
         return label_shape;
@@ -136,3 +135,5 @@ public:
 
 
 #endif /* DATASET_H */
+
+
