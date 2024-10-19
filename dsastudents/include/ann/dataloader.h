@@ -14,7 +14,7 @@
 #define DATALOADER_H
 #include "tensor/xtensor_lib.h"
 #include "loader/dataset.h"
-
+#include "list/XArrayList.h" 
 using namespace std;
 
 template<typename DType, typename LType>
