@@ -442,19 +442,7 @@ template <class T>
 void DLinkedList<T>::clear()
 {
     // TODO
-    if (deleteUserData != nullptr) {
     removeInternalData();
-        deleteUserData(this);
-    }
-    Node* curr = head->next;
-    while(curr != tail){
-        Node* tmp = curr;
-        curr = curr->next;
-        delete tmp;
-    }
-    head->next = tail;
-    tail->prev = head;
-    count = 0;
 }
 
 template <class T>
